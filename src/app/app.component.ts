@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 
 declare var webkitSpeechRecognition: any;
@@ -14,7 +14,9 @@ declare var SpeechRecognition: any;
 export class AppComponent {
   recognition: any;
 
-  constructor() {
+  result: string = '';
+
+  constructor(private changeDetectorRef: ChangeDetectorRef) {
     if ('SpeechRecongition' in window) {
       this.recognition =  new SpeechRecognition();
       console.log('Speech Recognition Exists');
@@ -22,25 +24,25 @@ export class AppComponent {
       this.recognition =  new webkitSpeechRecognition();
       console.log('Using Webkit Speech Recognition');
     }
+  }
 
+  record() {
     if(this.recognition) {
       this.recognition.continuous = false;
-      //this.recognition.lang = 'en-US';
+      this.recognition.lang = 'en-US';
       this.recognition.interimResults = false;
       this.recognition.maxAlternatives = 1;
-
-      console.log('default lang',this.recognition.lang);
-
       this.recognition.start();
-
       this.recognition.onresult = (result: any) => {
-        console.log('result', result);
+        this.setResult(result.results[0][0].transcript);
       }
     } else {
       console.log('Speech recognition not supported!');
     }
+  }
 
-    console.log('recognition',this.recognition);
-
+  setResult(res: string) {
+    this.result = res;
+    this.changeDetectorRef.detectChanges();
   }
 }
