@@ -1,6 +1,20 @@
-<div (click)="record()" class="hello">
+<div (click)="record()" class="hello"
+    [ngStyle]="{'background-color':currentColor}"
+>
 
-<h1>Click To Record</h1>
+    <h1>Speech color changer</h1>
+
+    <p class="hints">
+        Tap/click then say a color to change the background color of the app.
+        @for (color of colors; track $index) {
+            <span 
+                [ngStyle]="{'background-color':color}"> 
+                {{color}} 
+            </span>
+        }
+        
+    </p>
+
 
 @if(result) {
     {{result}}
