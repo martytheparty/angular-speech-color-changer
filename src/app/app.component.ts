@@ -1,9 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, effect } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { SpeechServiceService } from './speech-service.service';
 
-declare var webkitSpeechRecognition: any;
-declare var SpeechRecognition: any;
 
 @Component({
   selector: 'app-root',
@@ -13,41 +12,30 @@ declare var SpeechRecognition: any;
   styleUrl: './app.component.scss'
 })
 export class AppComponent {
-  recognition: any;
 
+  sp: SpeechServiceService = inject(SpeechServiceService);
   result: string = '';
 
   colors = [ 'aqua' , 'azure' , 'beige', 'bisque', 'black', 'blue', 'brown', 'chocolate', 'coral', 'crimson', 'cyan', 'fuchsia', 'ghostwhite', 'gold', 'goldenrod', 'gray', 'green', 'indigo', 'ivory', 'khaki', 'lavender', 'lime', 'linen', 'magenta', 'maroon', 'moccasin', 'navy', 'olive', 'orange', 'orchid', 'peru', 'pink', 'plum', 'purple', 'red', 'salmon', 'sienna', 'silver', 'snow', 'tan', 'teal', 'thistle', 'tomato', 'turquoise', 'violet', 'white', 'yellow'];
 
   currentColor = 'beige';
-  constructor(private changeDetectorRef: ChangeDetectorRef) {
-    if ('SpeechRecongition' in window) {
-      this.recognition =  new SpeechRecognition();
-      console.log('Speech Recognition Exists');
-    }  else if ('webkitSpeechRecognition' in window) {
-      this.recognition =  new webkitSpeechRecognition();
-      console.log('Using Webkit Speech Recognition');
-    }
+
+  constructor() {
+    effect(() => {
+      if (this.sp.voiceResult() !== "") {
+        this.setResult(this.sp.voiceResult())
+      }
+    });
   }
 
+
   record() {
-    if(this.recognition) {
-      this.recognition.continuous = false;
-      this.recognition.lang = 'en-US';
-      this.recognition.interimResults = false;
-      this.recognition.maxAlternatives = 1;
-      this.recognition.start();
-      this.recognition.onresult = (result: any) => {
-        this.setResult(result.results[0][0].transcript);
-      }
-    } else {
-      console.log('Speech recognition not supported!');
-    }
+    this.sp.record();
   }
 
   setResult(res: string) {
-    this.result = res;
-    this.currentColor = res;
-    this.changeDetectorRef.detectChanges();
+    this.result = `was: ${res}, is: ${res.replace(/\s+/g, '').toLowerCase()}`;
+    this.currentColor = res.replace(/\s+/g, '').toLowerCase();
+    //this.changeDetectorRef.detectChanges();
   }
 }
