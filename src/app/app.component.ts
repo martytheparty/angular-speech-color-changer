@@ -18,9 +18,18 @@ export class AppComponent {
 
   colors = [ 'aqua' , 'azure' , 'beige', 'bisque', 'black', 'blue', 'brown', 'chocolate', 'coral', 'crimson', 'cyan', 'fuchsia', 'ghostwhite', 'gold', 'goldenrod', 'gray', 'green', 'indigo', 'ivory', 'khaki', 'lavender', 'lime', 'linen', 'magenta', 'maroon', 'moccasin', 'navy', 'olive', 'orange', 'orchid', 'peru', 'pink', 'plum', 'purple', 'red', 'salmon', 'sienna', 'silver', 'snow', 'tan', 'teal', 'thistle', 'tomato', 'turquoise', 'violet', 'white', 'yellow'];
 
+  colorsDict: Dictionary = {};
+
   currentColor = 'beige';
 
   constructor() {
+
+    this.colors.forEach(
+      (color: string) => {
+        this.colorsDict[color] = 0;
+      }
+    );
+
     effect(() => {
       if (this.sp.voiceResult() !== "") {
         this.setResult(this.sp.voiceResult())
@@ -36,6 +45,15 @@ export class AppComponent {
   setResult(res: string) {
     this.result = `was: ${res}, is: ${res.replace(/\s+/g, '').toLowerCase()}`;
     this.currentColor = res.replace(/\s+/g, '').toLowerCase();
+
+    if (this.colorsDict[this.currentColor] !== undefined) {
+      this.colorsDict[this.currentColor] = this.colorsDict[this.currentColor] + 1;
+    }
     //this.changeDetectorRef.detectChanges();
   }
 }
+
+
+type Dictionary = {
+  [key: string]: number;
+};

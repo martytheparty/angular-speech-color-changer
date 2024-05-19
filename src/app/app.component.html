@@ -4,16 +4,24 @@
 
     <h1>Speech color changer</h1>
 
-    <p class="hints">
+    <div class="hints">
         Tap/click then say a color to change the background color of the app.
+        <table>
         @for (color of colors; track $index) {
+            <tr>
+                <td>
             <span 
                 [ngStyle]="{'background-color':color}"> 
                 {{color}} 
             </span>
+                </td>
+                <td>
+                    {{colorsDict[color]}}
+                </td>
+            </tr>
         }
-        
-    </p>
+        </table>
+    </div>
 
 
 @if(result) {
