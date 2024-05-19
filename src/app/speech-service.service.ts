@@ -1,4 +1,5 @@
 import { Injectable, signal } from '@angular/core';
+import { VoiceResponse } from './interfaces';
 
 declare var webkitSpeechRecognition: any;
 declare var SpeechRecognition: any;
@@ -8,7 +9,7 @@ declare var SpeechRecognition: any;
 })
 export class SpeechServiceService {
   recognition: any;
-  voiceResult = signal<string>('');
+  voiceResult = signal<VoiceResponse | undefined>(undefined);
 
   constructor() {
     if ('SpeechRecongition' in window) {
@@ -28,7 +29,8 @@ export class SpeechServiceService {
       this.recognition.maxAlternatives = 1;
       this.recognition.start();
       this.recognition.onresult = (result: any) => {
-        this.voiceResult.set(result.results[0][0].transcript);
+        console.log(result.results[0][0]);
+        this.voiceResult.set({color: result.results[0][0].transcript, confidence: result.results[0][0].confidence});
       }
     }
   }
