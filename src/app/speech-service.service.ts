@@ -29,9 +29,10 @@ export class SpeechServiceService {
       this.recognition.maxAlternatives = 1;
       this.recognition.start();
       this.recognition.onresult = (result: any) => {
-        console.log(result.results[0][0]);
         this.voiceResult.set({color: result.results[0][0].transcript, confidence: result.results[0][0].confidence});
       }
     }
+
+    console.log(this.recognition);
   }
 }

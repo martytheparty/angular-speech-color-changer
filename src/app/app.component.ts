@@ -16,6 +16,8 @@ export class AppComponent {
 
   sp: SpeechServiceService = inject(SpeechServiceService);
   result: string = '';
+  addMessage = '';
+  lastConfidence = 0;
 
   colors = [ 'aqua' , 'azure' , 'beige', 'bisque', 'black', 'blue', 'brown', 'chocolate', 'coral', 'crimson', 'cyan', 'fuchsia', 'ghostwhite', 'gold', 'goldenrod', 'gray', 'green', 'indigo', 'ivory', 'khaki', 'lavender', 'lime', 'linen', 'magenta', 'maroon', 'moccasin', 'navy', 'olive', 'orange', 'orchid', 'peru', 'pink', 'plum', 'purple', 'red', 'salmon', 'sienna', 'silver', 'snow', 'tan', 'teal', 'thistle', 'tomato', 'turquoise', 'violet', 'white', 'yellow'];
 
@@ -36,7 +38,13 @@ export class AppComponent {
     effect(() => {
       if (this.sp.voiceResult() !== undefined) {
         const result = this.sp.voiceResult() as VoiceResponse;
-        this.setResult(result.color, result.confidence)
+        if (this.addMessage === "") {
+          this.setResult(result.color, result.confidence);
+        } else {
+          this.addMessage = "";
+          this.addNewColor(result.color, result.confidence);
+        }
+
       }
     });
   }
@@ -53,8 +61,23 @@ export class AppComponent {
     if (this.colorsDict[this.currentColor] !== undefined) {
       this.colorsDict[this.currentColor] = this.colorsDict[this.currentColor] + 1;
       this.confidenceDict[this.currentColor] =  confidence;
+    } else {
+      this.lastConfidence = confidence;
+      setTimeout( () => {
+        this.addMessage = `${this.currentColor} is not a color that I recognize.  Say "YES" to add it to the list.`
+        this.record();
+      }, 1000 );
+
     }
-    //this.changeDetectorRef.detectChanges();
+  }
+
+  addNewColor(res: string, confidence: number) {
+    if (res.toLowerCase() === 'yes') {
+      this.colors.unshift(this.currentColor);
+      this.colorsDict[this.currentColor] = 1;
+      this.confidenceDict[this.currentColor] = this.lastConfidence;
+    }
+
   }
 }
 
