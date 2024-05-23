@@ -31,8 +31,16 @@ export class SpeechServiceService {
       this.recognition.onresult = (result: any) => {
         this.voiceResult.set({color: result.results[0][0].transcript, confidence: result.results[0][0].confidence});
       }
+
+      this.recognition.onend = (result: any) => {
+        console.log('onend',result);
+      }
+
+      this.recognition.onaudiostart = (result: any) => {
+        console.log('audio start', result);
+      }
     }
 
-    console.log(this.recognition);
+    console.log('Record Complet in service',this.recognition);
   }
 }

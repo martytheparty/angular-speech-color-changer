@@ -18,6 +18,7 @@ export class AppComponent {
   result: string = '';
   addMessage = '';
   lastConfidence = 0;
+  voiceState: VoiceState = 'Not Ready'
 
   colors = [ 'aqua' , 'azure' , 'beige', 'bisque', 'black', 'blue', 'brown', 'chocolate', 'coral', 'crimson', 'cyan', 'fuchsia', 'ghostwhite', 'gold', 'goldenrod', 'gray', 'green', 'indigo', 'ivory', 'khaki', 'lavender', 'lime', 'linen', 'magenta', 'maroon', 'moccasin', 'navy', 'olive', 'orange', 'orchid', 'peru', 'pink', 'plum', 'purple', 'red', 'salmon', 'sienna', 'silver', 'snow', 'tan', 'teal', 'thistle', 'tomato', 'turquoise', 'violet', 'white', 'yellow'];
 
@@ -52,6 +53,7 @@ export class AppComponent {
 
   record() {
     this.sp.record();
+    console.log('record complete in component');
   }
 
   setResult(res: string, confidence: number) {
@@ -85,3 +87,5 @@ export class AppComponent {
 type Dictionary = {
   [key: string]: number;
 };
+
+type VoiceState = 'Listening' | 'Processing' | 'Ready' | 'Not Ready';
