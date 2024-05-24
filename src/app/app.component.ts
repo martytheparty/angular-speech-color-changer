@@ -27,6 +27,8 @@ export class AppComponent {
 
   currentColor = 'beige';
 
+  lastCount = -1;
+
   constructor() {
 
     this.colors.forEach(
@@ -38,22 +40,44 @@ export class AppComponent {
 
     effect(() => {
       if (this.sp.voiceResult() !== undefined) {
+        //this.voiceState = 'Not Ready'
+        console.log('2: Recieved result', this.sp.voiceResult());
         const result = this.sp.voiceResult() as VoiceResponse;
-        if (this.addMessage === "") {
-          this.setResult(result.color, result.confidence);
-        } else {
-          this.addMessage = "";
-          this.addNewColor(result.color, result.confidence);
+        if (result.count !== this.lastCount)
+        {
+          this.lastCount = result.count;
+          if (this.addMessage === "") {
+            this.setResult(result.color, result.confidence);
+          } else {
+            this.addMessage = "";
+            this.addNewColor(result.color, result.confidence);
+          }
         }
 
       }
+
+      if (this.sp.audioStart() !== undefined) {
+        this.voiceState = 'Listening';
+      }
+  
+      if (this.sp.audioEnd() !== undefined) {
+         if (this.sp.audioEnd().eventPhase === 0) {
+           // console.log("FAULT: PUBLISHING ON END SIGNAL - I HAVE NO IDEA WHY THIS GOT CALLED", this.sp.audioEnd());
+         } else {
+          this.voiceState = 'Completed'
+        }
+      }
+
     });
+
+    
   }
 
 
   record() {
+    this.voiceState = 'Starting';
     this.sp.record();
-    console.log('record complete in component');
+    //console.log('record complete in component');
   }
 
   setResult(res: string, confidence: number) {
@@ -61,12 +85,14 @@ export class AppComponent {
     this.currentColor = res.replace(/\s+/g, '').toLowerCase();
 
     if (this.colorsDict[this.currentColor] !== undefined) {
+      // console.log('INCREMENT COUNTER');
       this.colorsDict[this.currentColor] = this.colorsDict[this.currentColor] + 1;
       this.confidenceDict[this.currentColor] =  confidence;
     } else {
       this.lastConfidence = confidence;
       setTimeout( () => {
         this.addMessage = `${this.currentColor} is not a color that I recognize.  Say "YES" to add it to the list.`
+        this.voiceState = 'Starting';
         this.record();
       }, 1000 );
 
@@ -88,4 +114,4 @@ type Dictionary = {
   [key: string]: number;
 };
 
-type VoiceState = 'Listening' | 'Processing' | 'Ready' | 'Not Ready';
+type VoiceState = 'Listening' | 'Processing' | 'Ready' | 'Not Ready' | 'Starting' | 'Completed';
